@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Геймерский опрос: Эмоции, зависимость и здоровье</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0b1120 0%, #111827 100%);
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, 'Roboto', sans-serif;
+            padding: 2rem 1.5rem;
+            color: #eef2ff;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* Заголовок */
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            background: linear-gradient(135deg, #c084fc, #60a5fa);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            letter-spacing: -0.3px;
+            margin-bottom: 0.75rem;
+        }
+
+        .header p {
+            color: #9ca3af;
+            font-size: 1.1rem;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* Сетка для карточек */
+        .questions-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2.5rem;
+        }
+
+        /* Карточка вопроса */
+        .question-card {
+            background: rgba(18, 25, 45, 0.7);
+            backdrop-filter: blur(2px);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.4);
+            transition: transform 0.2s ease, border-color 0.2s;
+        }
+
+        .question-card:hover {
+            border-color: rgba(96, 165, 250, 0.5);
+        }
+
+        .question-title {
+            font-size: 1.7rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .badge-multi {
+            background: #3b82f6;
+            font-size: 0.75rem;
+            font-weight: 500;
+            padding: 0.2rem 0.7rem;
+            border-radius: 40px;
+            background: #2563eb30;
+            border: 1px solid #3b82f6;
+            color: #bbd7fb;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: #cbd5e6;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #3b82f6;
+            padding-left: 1rem;
+        }
+
+        /* Опции (список вариантов) */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            margin-bottom: 1.8rem;
+        }
+
+        .option-item {
+            background: #0f172ad9;
+            border-radius: 1.2rem;
+            padding: 0.6rem 1rem 0.6rem 1rem;
+            transition: all 0.2s;
+            border: 1px solid #1e2a3e;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+            flex-wrap: wrap;
+        }
+
+        /* для чекбоксов / радио */
+        .option-label input {
+            margin-top: 0.2rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: #3b82f6;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .option-text {
+            flex: 1;
+            font-weight: 500;
+            font-size: 1rem;
+            color: #e2e8f0;
+            line-height: 1.4;
+        }
+
+        /* Результат после выбора */
+        .result-stats {
+            margin-top: 0.5rem;
+            margin-left: 2.1rem;
+            padding: 0.6rem 0.8rem;
+            background: #0a0f1c80;
+            border-radius: 1rem;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .stat-bar-container {
+            background: #1e293b;
+            border-radius: 30px;
+            height: 8px;
+            width: 100%;
+            margin: 6px 0 4px;
+            overflow: hidden;
+        }
+
+        .stat-bar {
+            background: linear-gradient(90deg, #60a5fa, #a855f7);
+            width: 0%;
+            height: 100%;
+            border-radius: 30px;
+            transition: width 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+
+        .stat-numbers {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 4px;
+        }
+
+        .percentage {
+            font-weight: 700;
+            color: #a5f3c3;
+        }
+
+        /* для radio группы (вопрос 2) */
+        .radio-group .option-item {
+            cursor: pointer;
+        }
+
+        /* кнопка сброса для каждого вопроса (опционально) */
+        .reset-btn {
+            background: none;
+            border: 1px solid #334155;
+            color: #9ca3af;
+            padding: 0.3rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 0.5rem;
+        }
+
+        .reset-btn:hover {
+            background: #2d3a5e;
+            color: white;
+            border-color: #5b7cbf;
+        }
+
+        .footer-note {
+            text-align: center;
+            margin-top: 2.5rem;
+            font-size: 0.8rem;
+            color: #6c7a91;
+            border-top: 1px solid #1e2a3e;
+            padding-top: 1.8rem;
+        }
+
+        @media (max-width: 700px) {
+            body {
+                padding: 1rem;
+            }
+            .question-title {
+                font-size: 1.3rem;
+            }
+            .question-text {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>🎮 Игровая аналитика сообщества</h1>
+        <p>Честный опрос: эмоции, зависимость и влияние на здоровье. Выбери вариант(ы) — сразу увидишь, сколько людей уже выбрали так же.</p>
+    </div>
+
+    <div class="questions-grid" id="questionsRoot"></div>
+    <div class="footer-note">
+        ⚡ Результаты обновляются в реальном времени • Данные хранятся в памяти сессии (статистика для всех)
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // ИСХОДНЫЕ ДАННЫЕ ОПРОСА (структура)
+    // Для каждого вопроса:
+    // - id: уникальный
+    // - type: 'checkbox' (множественный выбор) или 'radio' (одиночный)
+    // - questionText: текст вопроса
+    // - options: массив объектов { id, text, basePercent, baseCount }
+    //   basePercent и baseCount - это демонстрационные исходные данные (468 чел. итд.)
+    //   Но в интерактиве мы храним реальные "голоса" и динамически пересчитываем проценты
+    // --------------------------------------------------------------
+
+    // Для удобства: преобразуем в стартовую структуру counts (количество выбранных)
+    // Также важно: для radio (вопрос 2) у нас варианты исключающие, а для checkbox можно несколько.
+    // Для имитации живого опроса мы создаём хранилище "votes", где для каждого вопроса хранится Map(optionId -> количество голосов)
+    // При первом запуске инициализируем на основе предоставленных "базовых" данных: 468, 390, 252, 348, 222, 90 и тд.
+    // Также для вопроса 2: 72, 270, 258. Для вопроса 3: 426, 288, 372, 210, 114, 96, 168.
+
+    const INITIAL_DATA = {
+        q1: {   // эмоциональная реакция
+            type: 'checkbox',
+            text: 'Какие чувства ты чаще всего испытываешь при проигрыше в игре? (можно выбрать несколько)',
+            options: [
+                { id: 'q1_anger', text: 'Раздражение и злость (гнев)', baseCount: 468 },
+                { id: 'q1_revanche', text: 'Желание сразу же взять реванш', baseCount: 390 },
+                { id: 'q1_apathy', text: 'Апатия, желание бросить игру', baseCount: 252 },
+                { id: 'q1_injustice', text: 'Чувство несправедливости (из-за читеров/багов)', baseCount: 348 },
+                { id: 'q1_analyze', text: 'Анализирую свои ошибки', baseCount: 222 },
+                { id: 'q1_nothing', text: 'Ничего не чувствую, это просто игра', baseCount: 90 }
+            ]
+        },
+        q2: {   // осознание зависимости
+            type: 'radio',
+            text: 'Чувствуешь ли ты, что проводишь за играми слишком много времени, и хотел бы ты играть меньше?',
+            options: [
+                { id: 'q2_addict', text: 'Да, я хотел бы избавиться от зависимости, но у меня не получается', baseCount: 72 },
+                { id: 'q2_sometimes', text: 'Иногда чувствую, что мог бы тратить время полезнее, но сильно не переживаю', baseCount: 270 },
+                { id: 'q2_control', text: 'Нет, я полностью контролирую свое время и не считаю это зависимостью', baseCount: 258 }
+            ]
+        },
+        q3: {   // проблемы со здоровьем
+            type: 'checkbox',
+            text: 'С какими проблемами со здоровьем ты столкнулся за время увлечения играми? (можно выбрать несколько)',
+            options: [
+                { id: 'q3_vision', text: 'Ухудшение зрения (или ощущение сухости/усталости глаз)', baseCount: 426 },
+                { id: 'q3_back', text: 'Боли в спине или шее', baseCount: 288 },
+                { id: 'q3_sleep', text: 'Нарушение режима сна (ложусь спать позже обычного)', baseCount: 372 },
+                { id: 'q3_headache', text: 'Головные боли', baseCount: 210 },
+                { id: 'q3_wrist', text: 'Боли в кистях рук (запястье, пальцы)', baseCount: 114 },
+                { id: 'q3_no_issues', text: 'Никаких проблем не замечаю', baseCount: 96 },
+                { id: 'q3_weight', text: 'Лишний вес/недостаток физической активности', baseCount: 168 }
+            ]
+        }
+    };
+
+    // глобальное хранилище: countsMap[questionKey][optionId] = количество голосов
+    // также для каждого вопроса храним "общее количество участников" (для radio это сумма всех голосов, для checkbox — уникальных респондентов? 
+    // В классическом опросе множественного выбора проценты считаются от общего числа проголосовавших (каждый респондент мог выбрать несколько опций)
+    // В нашем случае, чтобы отображать проценты правдоподобно как в условии (78% от 600? 468/600=0.78), 
+    // нужно знать общее кол-во респондентов. У нас исходные данные: для вопроса1 суммарные голоса >100% потому что множественный.
+    // Общее количество уникальных участников для Q1: допустим изначальный общий опрошенных = 600 человек (468 / 0.78 = 600)
+    // Вычислим: 468 / 0.78 = 600, 390/0.65=600, 252/0.42=600. Значит база = 600 участников.
+    // Для Q3: 426/0.71 = 600, 288/0.48=600, 372/0.62=600, 210/0.35=600, 114/0.19=600, 96/0.16=600, 168/0.28=600. Тоже 600.
+    // Для Q2 radio: 72+270+258 = 600, проценты идеально 12%,45%,43%.
+    // Значит в стартовом состоянии общее число участников для каждого вопроса = 600. 
+    // При новых выборах (checkbox) мы увеличиваем счетчики выбранных опций и также увеличиваем общее количество участников (если пользователь впервые голосует).
+    // Для radio: при выборе нового варианта мы переносим голос (увеличиваем выбранный, уменьшаем предыдущий если был выбран) или если новый пользователь - просто добавляем.
+    // Упростим: каждый пользователь (сессия) может проголосовать один раз за каждый вопрос. Для радио - заменяет предыдущий выбор.
+    // Для чекбоксов - добавляет/убирает свои голоса (как изменение ответов). 
+    // Для удобства: будем отслеживать текущие выборы пользователя в localStorage/session? Для демо просто в памяти: currentUserSelections.
+    // Но главное требование: после выбора ответа появлялось количество людей, которые выбрали данный ответ (и проценты).
+    // Мы сделаем полностью функциональное хранилище votes и пользовательский профиль (текущая сессия). При загрузке инициализируем базой 600 участников.
+    
+    // Инициализация структур
+    let votes = {};        // { questionId: { optionId: count } }
+    let totalRespondents = {}; // { questionId: totalPeople } (уникальные респонденты для вопроса)
+    // Для радио нужно отслеживать активный выбор пользователя, для checkbox — массив выбранных.
+    let userChoices = {     // хранит id вопроса -> выбранные optionId (для radio это строка или null)
+        q1: new Set(),
+        q2: null,
+        q3: new Set()
+    };
+
+    function initData() {
+        // Инициализация votes и totalRespondents на основе базовых данных (600 участников)
+        const questionsKeys = ['q1', 'q2', 'q3'];
+        for (let qKey of questionsKeys) {
+            const q = INITIAL_DATA[qKey];
+            const totalBase = 600; // из расчёта выше
+            totalRespondents[qKey] = totalBase;
+            votes[qKey] = {};
+            for (let opt of q.options) {
+                votes[qKey][opt.id] = opt.baseCount;
+            }
+            // для q2 radio сумма проверим, она и так 600
+            if (qKey === 'q2') {
+                let sum = 0;
+                for (let opt of q.options) sum += votes[qKey][opt.id];
+                if (sum !== totalBase) console.warn("несоответствие q2");
+            }
+        }
+        // также сбросим пользовательские выборы
+        userChoices.q1.clear();
+        userChoices.q2 = null;
+        userChoices.q3.clear();
+    }
+
+    // Обновление статистики: при изменении голосов пересчитываем проценты и отрисовываем заново
+    // Хелпер: получить общее количество респондентов (уникальных) для вопроса
+    function getTotalRespondents(questionId) {
+        return totalRespondents[questionId];
+    }
+
+    // Добавить / удалить голос пользователя для checkbox вопроса
+    // При добавлении опции: если пользователь ранее не голосовал за этот вопрос, увеличиваем totalRespondents
+    // и для каждой опции, которую он выбрал, увеличиваем счетчик.
+    // При снятии галки: уменьшаем счетчик опции, и если после этого у пользователя не осталось выбранных опций, уменьшаем totalRespondents.
+    function updateCheckboxVote(questionId, optionId, isChecked) {
+        const prevSelectedSet = userChoices[questionId];
+        const wasEmpty = prevSelectedSet.size === 0;
+        
+        if (isChecked) {
+            // если раньше этого варианта не было в наборе
+            if (!prevSelectedSet.has(optionId)) {
+                prevSelectedSet.add(optionId);
+                // увеличиваем голос за опцию
+                votes[questionId][optionId] += 1;
+                // если ранее пользователь не участвовал (размер был 0, а стал 1) => увеличиваем totalRespondents
+                if (wasEmpty) {
+                    totalRespondents[questionId] += 1;
+                }
+            }
+        } else {
+            // снимаем
+            if (prevSelectedSet.has(optionId)) {
+                prevSelectedSet.delete(optionId);
+                votes[questionId][optionId] -= 1;
+                // если после удаления набор стал пустым, то уменьшаем общее кол-во респондентов
+                if (prevSelectedSet.size === 0) {
+                    totalRespondents[questionId] -= 1;
+                }
+            }
+        }
+        renderAllQuestions(); // перерисовка
+    }
+
+    // Для radio вопроса: при выборе нового варианта
+    function updateRadioVote(questionId, optionId) {
+        const currentSelected = userChoices[questionId];
+        // если уже выбран этот же вариант - ничего не делаем
+        if (currentSelected === optionId) return;
+        
+        // Если ранее был выбран какой-то вариант, убираем голос
+        if (currentSelected !== null) {
+            votes[questionId][currentSelected] -= 1;
+        } else {
+            // если ранее не был выбран (первый голос пользователя за этот вопрос), увеличиваем totalRespondents
+            totalRespondents[questionId] += 1;
+        }
+        // теперь добавляем новый выбор
+        votes[questionId][optionId] += 1;
+        userChoices[questionId] = optionId;
+        renderAllQuestions();
+    }
+
+    // Функция сброса всех данных (для демо) - вернуть к исходным значениям и очистить выборы пользователя
+    function resetAllToOriginal() {
+        initData(); // восстанавливает исходные counts и total = 600, а также очищает userChoices
+        renderAllQuestions();
+    }
+
+    // Рендер всей страницы
+    function renderAllQuestions() {
+        const root = document.getElementById('questionsRoot');
+        if (!root) return;
+        root.innerHTML = '';
+        const questionsOrder = ['q1', 'q2', 'q3'];
+        for (let qKey of questionsOrder) {
+            const question = INITIAL_DATA[qKey];
+            const card = document.createElement('div');
+            card.className = 'question-card';
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'question-title';
+            titleDiv.innerHTML = `<span>${qKey === 'q1' ? '🎭' : qKey === 'q2' ? '⏳' : '❤️‍🩹'}</span> 
+                                  <span>${qKey === 'q1' ? 'Эмоциональная реакция' : qKey === 'q2' ? 'Осознание зависимости' : 'Проблемы со здоровьем'}</span>`;
+            if (question.type === 'checkbox') {
+                const multi = document.createElement('span');
+                multi.className = 'badge-multi';
+                multi.innerText = '✓ несколько вариантов';
+                titleDiv.appendChild(multi);
+            } else {
+                const single = document.createElement('span');
+                single.className = 'badge-multi';
+                single.innerText = '● один вариант';
+                single.style.background = '#7c3aed30';
+                titleDiv.appendChild(single);
+            }
+            
+            const questionTextDiv = document.createElement('div');
+            questionTextDiv.className = 'question-text';
+            questionTextDiv.innerText = question.text;
+            
+            const optionsContainer = document.createElement('div');
+            optionsContainer.className = 'options-list';
+            
+            // Получаем данные для статистики
+            const totalResp = totalRespondents[qKey];
+            
+            for (let opt of question.options) {
+                const optId = opt.id;
+                const currentVotes = votes[qKey][optId];
+                let percent = 0;
+                if (totalResp > 0) {
+                    percent = (currentVotes / totalResp) * 100;
+                }
+                // Для отображения количества людей целое число
+                const peopleCount = currentVotes;
+                
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option-item';
+                
+                const label = document.createElement('label');
+                label.className = 'option-label';
+                
+                let input;
+                if (question.type === 'checkbox') {
+                    input = document.createElement('input');
+                    input.type = 'checkbox';
+                    input.checked = userChoices[qKey].has(optId);
+                    input.addEventListener('change', (e) => {
+                        e.stopPropagation();
+                        updateCheckboxVote(qKey, optId, input.checked);
+                    });
+                } else {
+                    input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `radio_${qKey}`;
+                    input.checked = (userChoices[qKey] === optId);
+                    input.addEventListener('change', (e) => {
+                        if (input.checked) {
+                            updateRadioVote(qKey, optId);
+                        }
+                    });
+                }
+                
+                const spanText = document.createElement('span');
+                spanText.className = 'option-text';
+                spanText.innerText = opt.text;
+                
+                label.appendChild(input);
+                label.appendChild(spanText);
+                optionDiv.appendChild(label);
+                
+                // Блок статистики: процент и количество людей
+                const statsDiv = document.createElement('div');
+                statsDiv.className = 'result-stats';
+                statsDiv.innerHTML = `
+                    <div class="stat-bar-container">
+                        <div class="stat-bar" style="width: ${percent}%;"></div>
+                    </div>
+                    <div class="stat-numbers">
+                        <span>📊 ${percent.toFixed(1)}%</span>
+                        <span>👥 ${peopleCount} чел.</span>
+                    </div>
+                `;
+                optionDiv.appendChild(statsDiv);
+                optionsContainer.appendChild(optionDiv);
+            }
+            
+            // Кнопка сброса для конкретного вопроса (не обязательно, но добавим общую кнопку сброса)
+            card.appendChild(titleDiv);
+            card.appendChild(questionTextDiv);
+            card.appendChild(optionsContainer);
+            root.appendChild(card);
+        }
+        
+        // Добавляем кнопку глобального сброса (восстановить исходные данные)
+        const existingResetBtn = document.getElementById('globalResetBtn');
+        if (!existingResetBtn) {
+            const btnContainer = document.createElement('div');
+            btnContainer.style.display = 'flex';
+            btnContainer.style.justifyContent = 'center';
+            btnContainer.style.marginTop = '1rem';
+            const resetBtn = document.createElement('button');
+            resetBtn.id = 'globalResetBtn';
+            resetBtn.innerText = '⟳ Сбросить опрос к исходным данным (вернуть статистику 600 чел.)';
+            resetBtn.style.background = '#2d3748';
+            resetBtn.style.border = '1px solid #4b5563';
+            resetBtn.style.color = '#e2e8f0';
+            resetBtn.style.padding = '0.7rem 1.5rem';
+            resetBtn.style.borderRadius = '60px';
+            resetBtn.style.fontWeight = '500';
+            resetBtn.style.cursor = 'pointer';
+            resetBtn.style.fontSize = '0.85rem';
+            resetBtn.style.transition = '0.2s';
+            resetBtn.onmouseover = () => resetBtn.style.background = '#3b4259';
+            resetBtn.onmouseout = () => resetBtn.style.background = '#2d3748';
+            resetBtn.onclick = () => resetAllToOriginal();
+            btnContainer.appendChild(resetBtn);
+            root.appendChild(btnContainer);
+        }
+    }
+    
+    // Инициализация и рендер
+    initData();
+    renderAllQuestions();
+    
+    // При желании можно добавить автосохранение, но все данные в памяти, сброс работает
+</script>
+</body>
+</html>
